@@ -10,7 +10,7 @@ services:
             context: "./"
             dockerfile: "./Dockerfile.dev"
         volumes:
-            - ".:/usr/src/bot"
+            - "./src:/usr/src/bot/src"
         env_file:
             - ".env"
         networks:
