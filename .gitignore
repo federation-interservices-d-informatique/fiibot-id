@@ -1,6 +1,8 @@
 # Compiled typescript
 dist/
 
+postgres
+
 # Node modules
 node_modules/
 
