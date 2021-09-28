@@ -7,7 +7,7 @@ export default class PingCommand extends Command {
     constructor(client: fiiClient) {
         super(client, {
             name: "ping",
-            description: "Get bot ping"
+            description: "Obtenir le ping du bot"
         });
     }
     async run(inter: CommandInteraction): Promise<void> {
