@@ -1,0 +1,59 @@
+---
+name: Build, test and lint
+on:
+  push: 
+    tags:
+      - '*'
+  
+jobs:
+  lint:
+    # Excute eslint & prettier
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      - name: Install dependencies
+        run: npm install
+      - name: Lint
+        run: npm run lint
+  compile:
+    # Compile with TSC
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      - name: Install dependencies
+        run: npm install
+      - name: Build
+        run: npm run build
+  doc:
+    needs: ['compile', 'lint']
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      - name: Install dependencies
+        run: npm install
+      - name: Gen changelog
+        run: bash .github/bin/genlog.sh
+      - id: tag
+        run: echo ::set-output name=tag::$(echo ${GITHUB_REF##*/})
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.tag.outputs.tag}}
+          release_name: Release ${{ steps.tag.outputs.tag }}
+          body_path: 'changelog.txt'
+          draft: false

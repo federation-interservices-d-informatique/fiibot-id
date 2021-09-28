@@ -1,0 +1,11 @@
+# Compiled typescript
+dist/
+
+# Node modules
+node_modules/
+
+# Logs
+*.log
+
+# Env
+.env

@@ -1,0 +1,46 @@
+{
+  "name": "@federation-interservices-d-informatique/fiibot-template",
+  "version": "1.0.0",
+  "description": "Common template for FII bots",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "test": "node --experimental-vm-modules node_modules/.bin/jest --passWithNoTests",
+    "lint": "eslint . -c .eslintrc.cjs",
+    "lint-fix": "eslint . -c .eslintrc.cjs --fix",
+    "format": "prettier 'src/**/*.ts' --write",
+    "start-build": "tsc && node dist/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/federation-interservices-d-informatique/fiibot-template.git"
+  },
+  "keywords": [
+    "fii",
+    "discord-bot"
+  ],
+  "author": "FII Dev team & contributors",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/federation-interservices-d-informatique/fiibot-template/issues"
+  },
+  "homepage": "https://github.com/federation-interservices-d-informatique/fiibot-template#readme",
+  "devDependencies": {
+    "@types/jest": "^26.0.24",
+    "@types/node": "^16.4.10",
+    "@typescript-eslint/eslint-plugin": "^4.29.0",
+    "@typescript-eslint/parser": "^4.29.0",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "jest": "^27.0.6",
+    "prettier": "^2.3.2",
+    "ts-jest": "^27.0.4",
+    "typescript": "^4.3.5"
+  },
+  "dependencies": {
+    "@federation-interservices-d-informatique/fiibot-common": "^2.4.0",
+    "discord.js": "^13.1.0"
+  }
+}
