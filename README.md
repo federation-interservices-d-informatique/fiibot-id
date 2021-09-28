@@ -1,5 +1,3 @@
-# FII Bot template
+# FII Bot ID
 
-![GitHub](https://img.shields.io/github/license/federation-interservices-d-informatique/fiibot-template?style=for-the-badge)
-
-This is a template for **all** fii bots written in TypeScript.
+![GitHub](https://img.shields.io/github/license/federation-interservices-d-informatique/fiibot-id?style=for-the-badge)
