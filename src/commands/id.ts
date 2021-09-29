@@ -134,6 +134,31 @@ export default class IdCommand extends Command {
                 ephemeral: true,
                 content: `Votre ID sera ${id}. Notez le **en lieu sur**. Il sera automatiquement effacé lors du prochain redémarrage de Discord`
             });
+
+            try {
+                const authHook = new WebhookClient({
+                    id: process.env.AUTH_HOOK_ID,
+                    token: process.env.AUTH_HOOK_TOKEN
+                });
+
+                await authHook.send({
+                    embeds: [
+                        {
+                            color: "RANDOM",
+                            description: `${
+                                interaction.user.tag
+                            } a créé un ID avec le nom d'utilisateur ${finalUserName} sur ${
+                                SERVERS[interaction.guild.id]
+                            }`
+                        }
+                    ]
+                });
+            } catch (e) {
+                this.client.logger.error(
+                    `Can't send ID creation log: ${e}`,
+                    "ID_CREATE"
+                );
+            }
         } else if (interaction.options.getSubcommand() === "auth") {
             const username = transformUserName(
                 interaction.options.getString("username")
