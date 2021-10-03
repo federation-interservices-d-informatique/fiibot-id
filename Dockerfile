@@ -10,8 +10,9 @@ RUN ["npm", "install", "--production"]
 FROM node:16-alpine3.14
 WORKDIR /usr/src/bot
 RUN adduser -D -H bot bot
+COPY ./wait-for-postgres.sh ./
 COPY --from=build --chown=bot:bot /app/bot/dist ./dist
 COPY --from=build --chown=bot:bot /app/bot/package.json ./package.json
 COPY --from=build --chown=bot:bot /app/bot/node_modules ./node_modules
 USER bot
-ENTRYPOINT [ "node", "/usr/src/bot/dist/index.js" ]
+ENTRYPOINT [ "/usr/src/bot/wait-for-postgres.sh", "node", "/usr/src/bot/dist/index.js" ]
