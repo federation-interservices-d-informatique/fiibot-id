@@ -1,6 +1,6 @@
 {
     "name": "@federation-interservices-d-informatique/fiibot-id",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "description": "FII ID management bots",
     "main": "dist/index.js",
     "type": "module",
