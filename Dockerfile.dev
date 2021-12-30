@@ -10,3 +10,5 @@ COPY ./src ./
 COPY ./tsconfig.json ./
 
 CMD nodemon --watch 'src/*' --ext 'ts' --exec 'npm run start-build'
+
+# vim: ft=dockerfile
