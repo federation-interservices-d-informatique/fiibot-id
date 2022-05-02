@@ -22,3 +22,4 @@ const client = new fiiClient(
         }
     }
 );
+
