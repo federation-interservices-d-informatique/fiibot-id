@@ -2,7 +2,6 @@ FROM node:18-alpine3.14 as build
 WORKDIR /app/bot
 
 COPY ./src ./src
-COPY ./prisma ./prisma
 COPY ./*.json ./
 COPY ./docker/entrypoint.sh ./
 RUN apk update && \
