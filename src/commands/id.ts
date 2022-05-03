@@ -2,8 +2,7 @@ import {
     Command,
     fiiClient
 } from "@federation-interservices-d-informatique/fiibot-common";
-import { argon2i } from "argon2-ffi";
-import { randomBytes } from "crypto";
+import { Algorithm as HashAlgorithm, hash, verify } from "@node-rs/argon2";
 import {
     ApplicationCommandOptionChoice,
     CommandInteraction,
@@ -124,8 +123,9 @@ export default class IdCommand extends Command {
                 Math.random() * (9999999999 - 1000000000) + 1000000000
             );
             const id = `FII-${CODENAMES[server]}-${index}-${random}-FII`;
-            const salt = randomBytes(32);
-            const hashedID = await argon2i.hash(id, salt);
+            const hashedID = await hash(id, {
+                algorithm: HashAlgorithm.Argon2i
+            });
             await this.client.dbclient.set(`id-${finalUserName}`, hashedID);
 
             createdUsers.push(interaction.user.id);
@@ -176,8 +176,8 @@ export default class IdCommand extends Command {
                 `id-${username}`
             );
 
-            if (await argon2i.verify(hashedID, inputID)) {
-                interaction.reply({
+            if (await verify(hashedID, inputID)) {
+                await interaction.reply({
                     ephemeral: true,
                     embeds: [
                         {
@@ -192,7 +192,7 @@ export default class IdCommand extends Command {
                         token: process.env.AUTH_HOOK_TOKEN
                     });
 
-                    authWhClient.send({
+                    await authWhClient.send({
                         embeds: [
                             {
                                 title: `Authentification réussie pour ${interaction.user.tag} (${interaction.user.id})`,
@@ -207,9 +207,15 @@ export default class IdCommand extends Command {
                         ]
                     });
                 } catch (e) {
-                    await interaction.followUp(
-                        "Imossible de communiquer la réussite au C.A de la FII!"
+                    this.client.logger.error(
+                        `Can't send id auth info: ${e}`,
+                        "ID_AUTH"
                     );
+                    await interaction.followUp({
+                        content:
+                            "Imopssible de communiquer la réussite au C.A de la FII!",
+                        ephemeral: true
+                    });
                 }
             } else {
                 await interaction.reply({
