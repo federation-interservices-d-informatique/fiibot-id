@@ -40,7 +40,7 @@
     },
     "dependencies": {
         "@federation-interservices-d-informatique/fiibot-common": "^3.1.0",
-        "argon2-ffi": "^2.0.0",
+        "@node-rs/argon2": "^1.1.0",
         "discord.js": "^13.6.0"
     }
 }
