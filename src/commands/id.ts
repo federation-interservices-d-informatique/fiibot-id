@@ -1,17 +1,24 @@
 import {
-    Command,
-    fiiClient
+    BotInteraction,
+    FiiClient
 } from "@federation-interservices-d-informatique/fiibot-common";
 import { Algorithm as HashAlgorithm, hash, verify } from "@node-rs/argon2";
 import {
-    ApplicationCommandOptionChoice,
-    CommandInteraction,
+    ApplicationCommandOptionChoiceData,
+    ApplicationCommandOptionType,
+    ChatInputCommandInteraction,
+    Colors,
     WebhookClient
 } from "discord.js";
-import { CODENAMES, SERVERS } from "../utils/constants.js";
+import {
+    CODENAMES,
+    CodenamesKey,
+    SERVERS,
+    ServersKey
+} from "../utils/constants.js";
 import { transformUserName } from "../utils/transformUserNames.js";
-const getServersChoices = (): ApplicationCommandOptionChoice[] => {
-    const choices = [];
+const getServersChoices = (): ApplicationCommandOptionChoiceData<string>[] => {
+    const choices: ApplicationCommandOptionChoiceData<string>[] = [];
     Object.entries(SERVERS).forEach((e) => {
         choices.push({
             name: e[1],
@@ -21,25 +28,25 @@ const getServersChoices = (): ApplicationCommandOptionChoice[] => {
 
     return choices;
 };
-export default class IdCommand extends Command {
-    constructor(client: fiiClient) {
+export default class IdCommand extends BotInteraction {
+    constructor(client: FiiClient) {
         super(client, {
             name: "id",
             description: "Gérer son ID FII",
             options: [
                 {
-                    type: "SUB_COMMAND",
+                    type: ApplicationCommandOptionType.Subcommand,
                     name: "create",
                     description: "Créer un id FII",
                     options: [
                         {
-                            type: "STRING",
+                            type: ApplicationCommandOptionType.String,
                             name: "username",
                             description: "Votre nom d'utilisateur",
                             required: true
                         },
                         {
-                            type: "STRING",
+                            type: ApplicationCommandOptionType.String,
                             name: "serveur",
                             description: "Le serveur auquel sera lié l'ID",
                             required: true,
@@ -48,18 +55,18 @@ export default class IdCommand extends Command {
                     ]
                 },
                 {
-                    type: "SUB_COMMAND",
+                    type: ApplicationCommandOptionType.Subcommand,
                     name: "auth",
                     description: "Vérifier que son ID FII est valide",
                     options: [
                         {
-                            type: "STRING",
+                            type: ApplicationCommandOptionType.String,
                             name: "username",
                             description: "Votre nom d'utilisateur",
                             required: true
                         },
                         {
-                            type: "STRING",
+                            type: ApplicationCommandOptionType.String,
                             name: "id",
                             description: "Votre ID",
                             required: true
@@ -69,11 +76,18 @@ export default class IdCommand extends Command {
             ]
         });
     }
-    async run(interaction: CommandInteraction): Promise<void> {
+    async runChatInputCommand(
+        interaction: ChatInputCommandInteraction
+    ): Promise<void> {
         if (interaction.options.getSubcommand() === "create") {
-            const username = interaction.options.get("username")
-                .value as string;
+            const username = (interaction.options.get("username")?.value ??
+                "") as string;
             const finalUserName = transformUserName(username);
+
+            if (!username) {
+                await interaction.reply("Votre nom d'utilisateur est vide!");
+                return;
+            }
 
             if (username !== finalUserName) {
                 await interaction.reply({
@@ -94,42 +108,49 @@ export default class IdCommand extends Command {
                 return;
             }
 
-            if (await this.client.dbclient.has(`id-${finalUserName}`)) {
+            if (await this.client.dbClient?.has(`id-${finalUserName}`)) {
                 await interaction.editReply(
                     `Le nom d'utilisateur ${finalUserName} est déjà utilisé. Veuillez en choisir un autre.`
                 );
                 return;
             }
             const createdUsers =
-                (await this.client.dbclient.get<string[]>("in-createdids")) ||
+                (await this.client.dbClient?.get<string[]>("in-createdids")) ||
                 [];
             if (createdUsers.includes(interaction.user.id)) {
                 await interaction.editReply("Vous avez déjà créé un ID!");
                 return;
             }
-            const server = interaction.options.get("serveur").value as string;
+            // Fallback to HUB
+            const server = (interaction.options.get("serveur")?.value ??
+                SERVERS["706283053160464395"]) as string;
 
             await interaction.followUp({
                 ephemeral: true,
-                content: `L'ID sera lié au serveur ${SERVERS[server]} (${CODENAMES[server]})`
+                content: `L'ID sera lié au serveur ${
+                    SERVERS[server as ServersKey]
+                } (${CODENAMES[server as CodenamesKey]})`
             });
 
             const index =
-                ((await this.client.dbclient.get<number>("in-index")) || 0) + 1;
+                ((await this.client.dbClient?.get<number>("in-index")) || 0) +
+                1;
 
-            await this.client.dbclient.set("in-index", index);
+            await this.client.dbClient?.set("in-index", index);
 
             const random = Math.floor(
                 Math.random() * (9999999999 - 1000000000) + 1000000000
             );
-            const id = `FII-${CODENAMES[server]}-${index}-${random}-FII`;
+            const id = `FII-${
+                CODENAMES[server as ServersKey]
+            }-${index}-${random}-FII`;
             const hashedID = await hash(id, {
                 algorithm: HashAlgorithm.Argon2i
             });
-            await this.client.dbclient.set(`id-${finalUserName}`, hashedID);
+            await this.client.dbClient?.set(`id-${finalUserName}`, hashedID);
 
             createdUsers.push(interaction.user.id);
-            await this.client.dbclient.set("in-createdids", createdUsers);
+            await this.client.dbClient?.set("in-createdids", createdUsers);
             await interaction.followUp({
                 ephemeral: true,
                 content: `Votre ID sera ${id}. Notez le **en lieu sur**. Il sera automatiquement effacé lors du prochain redémarrage de Discord`
@@ -137,18 +158,18 @@ export default class IdCommand extends Command {
 
             try {
                 const authHook = new WebhookClient({
-                    id: process.env.AUTH_HOOK_ID,
-                    token: process.env.AUTH_HOOK_TOKEN
+                    id: process.env.AUTH_HOOK_ID ?? "INVALID",
+                    token: process.env.AUTH_HOOK_TOKEN ?? "INVALID"
                 });
 
                 await authHook.send({
                     embeds: [
                         {
-                            color: "RANDOM",
+                            color: Colors.Green,
                             description: `${
                                 interaction.user.tag
                             } a créé un ID avec le nom d'utilisateur ${finalUserName} sur ${
-                                SERVERS[interaction.guild.id]
+                                SERVERS[interaction.guildId as ServersKey]
                             }`
                         }
                     ]
@@ -161,20 +182,20 @@ export default class IdCommand extends Command {
             }
         } else if (interaction.options.getSubcommand() === "auth") {
             const username = transformUserName(
-                interaction.options.getString("username")
+                interaction.options.getString("username") ?? ""
             );
-            const inputID = interaction.options.getString("id");
+            const inputID = interaction.options.getString("id") ?? "";
 
-            if (!(await this.client.dbclient.has(`id-${username}`))) {
+            if (!(await this.client.dbClient?.has(`id-${username}`))) {
                 await interaction.reply(
                     `Aucun id n'existe avec ne nom d'utilisateur ${username}`
                 );
                 return;
             }
 
-            const hashedID = await this.client.dbclient.get<string>(
+            const hashedID = (await this.client.dbClient?.get<string>(
                 `id-${username}`
-            );
+            )) as string;
 
             if (await verify(hashedID, inputID)) {
                 await interaction.reply({
@@ -182,21 +203,21 @@ export default class IdCommand extends Command {
                     embeds: [
                         {
                             title: "Authentification réussie!",
-                            color: "GREEN"
+                            color: Colors.Green
                         }
                     ]
                 });
                 try {
                     const authWhClient = new WebhookClient({
-                        id: process.env.AUTH_HOOK_ID,
-                        token: process.env.AUTH_HOOK_TOKEN
+                        id: process.env.AUTH_HOOK_ID ?? "INVALID",
+                        token: process.env.AUTH_HOOK_TOKEN ?? "INVALID"
                     });
 
                     await authWhClient.send({
                         embeds: [
                             {
                                 title: `Authentification réussie pour ${interaction.user.tag} (${interaction.user.id})`,
-                                color: "GREEN",
+                                color: Colors.Green,
                                 fields: [
                                     {
                                         name: "Nom d'utilisteur",

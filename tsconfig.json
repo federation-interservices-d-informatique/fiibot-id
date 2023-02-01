@@ -1,19 +1,8 @@
 {
-    "include": [
-        "src/**/*.ts"
-    ],
-    "exclude": [
-        "node_modules/*",
-        "dist/"
-    ],
+    "extends": "@federation-interservices-d-informatique/fiibot-common",
+    "include": ["src/**/*.ts", "../src/**/*.ts"],
+    "exclude": ["node_modules/", "dist"],
     "compilerOptions": {
-        "allowJs": false,
-        "target": "esnext",
-        "skipLibCheck": true,
-        "declaration": true,
-        "outDir": "dist",
-        "moduleResolution": "node",
-        "module": "esnext",
-        "esModuleInterop": true
+        "outDir": "dist"
     }
 }

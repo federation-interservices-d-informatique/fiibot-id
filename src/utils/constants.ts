@@ -6,6 +6,8 @@ export enum SERVERS {
     "622831434427662346" = "Linux Pour Tous"
 }
 
+export type ServersKey = keyof typeof SERVERS;
+
 export enum CODENAMES {
     "696156347946762240" = "MIM",
     "706283053160464395" = "HUB",
@@ -13,3 +15,4 @@ export enum CODENAMES {
     "745664551831339150" = "ADP",
     "622831434427662346" = "LPT"
 }
+export type CodenamesKey = keyof typeof CODENAMES;
