@@ -6,7 +6,7 @@ RUN apk update && \
 
 COPY package*.json ./
 RUN npm install
-RUN npm i -g nodemon
+RUN npm i -g tsc-watch
 
 COPY ./src ./
 COPY ./tsconfig.json ./
