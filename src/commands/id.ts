@@ -1,6 +1,10 @@
 import {
     BotInteraction,
-    FiiClient
+    FiiClient,
+    SERVER_CODENAMES,
+    ServerCodenamesKey,
+    SERVERS,
+    ServersKey
 } from "@federation-interservices-d-informatique/fiibot-common";
 import { Algorithm as HashAlgorithm, hash, verify } from "@node-rs/argon2";
 import {
@@ -10,12 +14,6 @@ import {
     Colors,
     WebhookClient
 } from "discord.js";
-import {
-    CODENAMES,
-    CodenamesKey,
-    SERVERS,
-    ServersKey
-} from "../utils/constants.js";
 import { transformUserName } from "../utils/transformUserNames.js";
 const getServersChoices = (): ApplicationCommandOptionChoiceData<string>[] => {
     const choices: ApplicationCommandOptionChoiceData<string>[] = [];
@@ -129,7 +127,7 @@ export default class IdCommand extends BotInteraction {
                 ephemeral: true,
                 content: `L'ID sera lié au serveur ${
                     SERVERS[server as ServersKey]
-                } (${CODENAMES[server as CodenamesKey]})`
+                } (${SERVER_CODENAMES[server as ServerCodenamesKey]})`
             });
 
             const index =
@@ -142,7 +140,7 @@ export default class IdCommand extends BotInteraction {
                 Math.random() * (9999999999 - 1000000000) + 1000000000
             );
             const id = `FII-${
-                CODENAMES[server as ServersKey]
+                SERVER_CODENAMES[server as ServerCodenamesKey]
             }-${index}-${random}-FII`;
             const hashedID = await hash(id, {
                 algorithm: HashAlgorithm.Argon2i
