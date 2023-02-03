@@ -10,7 +10,7 @@ RUN apk add --no-cache postgresql gcc musl-dev linux-headers git python3 make g+
 RUN npm install
 RUN npx tsc
 RUN rm -rf node_modules
-RUN npm ci --production
+RUN npm ci --omit=dev
 
 FROM node:18-alpine3.14 as prod
 WORKDIR /usr/src/bot
