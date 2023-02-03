@@ -12,7 +12,7 @@ RUN npx tsc
 RUN rm -rf node_modules
 RUN npm ci --omit=dev
 
-FROM node:18-alpine3.14 as prod
+FROM node:18-alpine3.17 as prod
 WORKDIR /usr/src/bot
 
 RUN adduser -D -H bot bot
