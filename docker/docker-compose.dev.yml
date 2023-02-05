@@ -17,7 +17,7 @@ services:
       - "../.env"
     tty: true
   db:
-    image: "postgres:14.2-alpine"
+    image: "postgres:15.1-alpine"
     env_file:
       - "../.env"
     volumes:
