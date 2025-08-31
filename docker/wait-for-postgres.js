@@ -20,6 +20,7 @@ const sleep = async (time) => {
             await client.connect();
         } catch (e) {
             console.log("Failed to connect... retrying");
+            console.log(e)
             error = true;
             await sleep(2500);
         }
