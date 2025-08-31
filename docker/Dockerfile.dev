@@ -1,12 +1,11 @@
-FROM node:18-alpine3.17 as build
+FROM oven/bun:1-alpine as build
 WORKDIR /usr/src/bot
 
 RUN apk update && \
     apk add --no-cache gcc musl-dev linux-headers git python3 make g++
 
 COPY package*.json ./
-RUN npm install
-RUN npm i -g tsc-watch
+RUN bun install
 
 COPY ./src ./
 COPY ./tsconfig.json ./

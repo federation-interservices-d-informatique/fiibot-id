@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import { Client } from "ts-postgres";
 
 const sleep = async (time) => {

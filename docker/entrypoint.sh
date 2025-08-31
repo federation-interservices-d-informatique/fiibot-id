@@ -2,6 +2,6 @@
 set -e
 DIR="$(realpath "$(dirname "${0}")")"
 # Wait for PostgreSQL to start
-timeout 25s "${DIR}"/wait-for-postgres.js
+timeout 25s bun "${DIR}"/wait-for-postgres.js
 
-node "${DIR}/dist/index.js"
+bun "${DIR}/src/index.ts"
