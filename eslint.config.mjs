@@ -4,7 +4,7 @@ import fiiConfig from '@federation-interservices-d-informatique/fiibot-common/es
 
 export default tseslint.config(
     ...fiiConfig,
-    globalIgnores(["dist/**", "**/node_modules/*"]),
+    globalIgnores(["dist/**", "**/node_modules/*", "docker/"]),
     {
         languageOptions: {
             parserOptions: {

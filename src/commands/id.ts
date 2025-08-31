@@ -12,6 +12,7 @@ import {
     ApplicationCommandOptionType,
     ChatInputCommandInteraction,
     Colors,
+    MessageFlags,
     WebhookClient
 } from "discord.js";
 import { transformUserName } from "../utils/transformUserNames.js";
@@ -90,12 +91,12 @@ export default class IdCommand extends BotInteraction {
             if (username !== finalUserName) {
                 await interaction.reply({
                     content: `Votre nom d'utilisateur a été modifié car il contenait des espaces.\nNouveau nom d'utilisateur: ${finalUserName}`,
-                    ephemeral: true
+                    flags: MessageFlags.Ephemeral
                 });
             } else {
                 await interaction.reply({
-                    ephemeral: true,
-                    content: `Nom d'utilisateur: ${username}`
+                    content: `Nom d'utilisateur: ${username}`,
+                    flags: MessageFlags.Ephemeral
                 });
             }
             if (/<@(!|&)[0-9]{15,20}>/.test(finalUserName)) {
@@ -113,7 +114,7 @@ export default class IdCommand extends BotInteraction {
                 return;
             }
             const createdUsers =
-                (await this.client.dbClient?.get<string[]>("in-createdids")) ||
+                (await this.client.dbClient?.get<string[]>("in-createdids")) ??
                 [];
             if (createdUsers.includes(interaction.user.id)) {
                 await interaction.editReply("Vous avez déjà créé un ID!");
@@ -124,14 +125,14 @@ export default class IdCommand extends BotInteraction {
                 SERVERS["706283053160464395"]) as string;
 
             await interaction.followUp({
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral,
                 content: `L'ID sera lié au serveur ${
                     SERVERS[server as ServersKey]
                 } (${SERVER_CODENAMES[server as ServerCodenamesKey]})`
             });
 
             const index =
-                ((await this.client.dbClient?.get<number>("in-index")) || 0) +
+                ((await this.client.dbClient?.get<number>("in-index")) ?? 0) +
                 1;
 
             await this.client.dbClient?.set("in-index", index);
@@ -141,7 +142,7 @@ export default class IdCommand extends BotInteraction {
             );
             const id = `FII-${
                 SERVER_CODENAMES[server as ServerCodenamesKey]
-            }-${index}-${random}-FII`;
+            }-${index.toString()}-${random.toString()}-FII`;
             const hashedID = await hash(id, {
                 algorithm: HashAlgorithm.Argon2i
             });
@@ -150,8 +151,8 @@ export default class IdCommand extends BotInteraction {
             createdUsers.push(interaction.user.id);
             await this.client.dbClient?.set("in-createdids", createdUsers);
             await interaction.followUp({
-                ephemeral: true,
-                content: `Votre ID sera ${id}. Notez le **en lieu sur**. Il sera automatiquement effacé lors du prochain redémarrage de Discord`
+                content: `Votre ID sera ${id}. Notez le **en lieu sur**. Il sera automatiquement effacé lors du prochain redémarrage de Discord`,
+                flags: MessageFlags.Ephemeral
             });
 
             try {
@@ -173,10 +174,11 @@ export default class IdCommand extends BotInteraction {
                     ]
                 });
             } catch (e) {
-                this.client.logger.error(
-                    `Can't send ID creation log: ${e}`,
-                    "ID_CREATE"
-                );
+                if (e instanceof Error)
+                    this.client.logger.error(
+                        `Can't send ID creation log: ${e}`,
+                        "ID_CREATE"
+                    );
             }
         } else if (interaction.options.getSubcommand() === "auth") {
             const username = transformUserName(
@@ -193,11 +195,11 @@ export default class IdCommand extends BotInteraction {
 
             const hashedID = (await this.client.dbClient?.get<string>(
                 `id-${username}`
-            )) as string;
+            )) ?? "";
 
             if (await verify(hashedID, inputID)) {
                 await interaction.reply({
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                     embeds: [
                         {
                             title: "Authentification réussie!",
@@ -226,19 +228,21 @@ export default class IdCommand extends BotInteraction {
                         ]
                     });
                 } catch (e) {
-                    this.client.logger.error(
-                        `Can't send id auth info: ${e}`,
-                        "ID_AUTH"
-                    );
+                    if (e instanceof Error)
+                        this.client.logger.error(
+                            `Can't send id auth info: ${e}`,
+                            "ID_AUTH"
+                        );
+
                     await interaction.followUp({
                         content:
                             "Imopssible de communiquer la réussite au C.A de la FII!",
-                        ephemeral: true
+                        flags: MessageFlags.Ephemeral
                     });
                 }
             } else {
                 await interaction.reply({
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                     content: "Combinaison ID/Nom d'utilisateur incorrect"
                 });
             }
