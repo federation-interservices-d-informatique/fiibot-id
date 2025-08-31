@@ -18,6 +18,7 @@ RUN apk add --no-cache curl
 
 COPY --from=build --chown=bot:bot /app/bot/package.json ./package.json
 RUN bun install --production
+COPY --from=build --chown=bot:bot /app/bot/src ./
 COPY --from=build --chown=bot:bot /app/bot/entrypoint.sh ./
 COPY --from=build --chown=bot:bot /app/bot/wait-for-postgres.js ./
 COPY --from=build --chown=bot:bot /app/bot/healthcheck.sh ./

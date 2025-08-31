@@ -5,10 +5,11 @@ const sleep = async (time) => {
 };
 
 (async () => {
+    const port = parseInt(process.env.POSTGRES_PORT)
     const client = new Client({
         host: process.env.DB_HOST,
         user: process.env.POSTGRES_USER,
-        port: parseInt(process.env.POSTGRES_PORT) ?? 5432,
+        port: isNaN(port) ? 5432 : port,
         database: process.env.POSTGRES_DB,
         password: process.env.POSTGRES_PASSWORD
     });
