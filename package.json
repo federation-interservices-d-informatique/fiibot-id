@@ -6,11 +6,10 @@
     "type": "module",
     "scripts": {
         "build": "tsc",
-        "test": "echo Hello",
-        "lint": "eslint . -c .eslintrc.yml",
-        "lint-fix": "eslint . -c .eslintrc.yml --fix",
+        "lint": "eslint .",
+        "lint-fix": "eslint . --fix",
         "format": "prettier 'src/**/*.ts' --write",
-        "start-build": "tsc && node dist/index.js"
+        "start-build": "tsc && bun src/index.ts"
     },
     "repository": {
         "type": "git",
@@ -27,18 +26,18 @@
     },
     "homepage": "https://github.com/federation-interservices-d-informatique/fiibot-template#readme",
     "devDependencies": {
-        "@types/node": "^20.5.3",
-        "@typescript-eslint/eslint-plugin": "^6.4.1",
-        "@typescript-eslint/parser": "^6.4.1",
-        "eslint": "^8.47.0",
-        "eslint-config-prettier": "^9.0.0",
-        "eslint-plugin-prettier": "^5.0.0",
-        "prettier": "^3.0.2",
-        "typescript": "^5.1.6"
+        "@types/node": "^24.3.0",
+        "@typescript-eslint/eslint-plugin": "^8.41.0",
+        "@typescript-eslint/parser": "^8.41.0",
+        "eslint": "^9.34.0",
+        "eslint-config-prettier": "^10.1.8",
+        "eslint-plugin-prettier": "^5.5.4",
+        "prettier": "^3.6.2",
+        "typescript": "^5.9.2"
     },
     "dependencies": {
-        "@federation-interservices-d-informatique/fiibot-common": "^4.0.10",
-        "@node-rs/argon2": "^1.5.2",
-        "discord.js": "^14.13.0"
+        "@federation-interservices-d-informatique/fiibot-common": "^4.0.14",
+        "@node-rs/argon2": "^2.0.2",
+        "discord.js": "^14.22.1"
     }
 }
