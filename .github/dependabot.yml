@@ -1,0 +1,22 @@
+---
+version: 2
+updates:
+  - package-ecosystem: docker-compose
+    directories:
+      - /docker
+    schedule:
+      interval: daily
+  - package-ecosystem: docker
+    directories:
+      - /docker
+    schedule:
+      interval: daily
+  - package-ecosystem: npm
+    directories:
+      - /
+    schedule:
+      interval: daily
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: daily
